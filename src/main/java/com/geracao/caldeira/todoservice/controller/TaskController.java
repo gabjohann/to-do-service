@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/tasks")
 public class TaskController {
     private final TaskService taskService;
 
@@ -19,18 +20,18 @@ public class TaskController {
     }
 
     // listar todas as tarefas
-    @GetMapping("/tasks")
+    @GetMapping("/")
     public List<Task> getAllTaskList() {
         return taskService.getAllTasks();
     }
 
     // adicionar uma nova tarefa
-    @PostMapping("/tasks/add")
+    @PostMapping("/add")
     public Task addTask(@RequestBody Task task) {
         return taskService.addTask(task);
     }
 
-    @PutMapping("/tasks/edit/{taskId}")
+    @PutMapping("/edit/{taskId}")
     public Task editTask(@PathVariable Long taskId, @RequestBody Map<String, Object> updates) {
         Optional<Task> taskToEdit = taskService.findTaskById(taskId);
 
@@ -56,7 +57,7 @@ public class TaskController {
     }
 
     // remover uma tarefa
-    @DeleteMapping("/tasks/delete/{taskId}")
+    @DeleteMapping("/delete/{taskId}")
     public void deleteTask(@PathVariable Long taskId) {
         Optional<Task> taskToDelete = taskService.findTaskById(taskId);
         if (taskToDelete.isPresent()) {
