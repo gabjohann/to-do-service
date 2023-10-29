@@ -1,4 +1,4 @@
-package com.geracao.caldeira.todoservice;
+package com.geracao.caldeira.todoservice.model;
 
 import lombok.Data;
 import java.util.Date;

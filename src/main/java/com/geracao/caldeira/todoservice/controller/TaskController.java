@@ -1,6 +1,8 @@
-package com.geracao.caldeira.todoservice;
+package com.geracao.caldeira.todoservice.controller;
 
-import lombok.RequiredArgsConstructor;
+import com.geracao.caldeira.todoservice.TaskNotFoundException;
+import com.geracao.caldeira.todoservice.model.Task;
+import com.geracao.caldeira.todoservice.service.TaskService;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Field;
@@ -9,27 +11,28 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequiredArgsConstructor
 public class TaskController {
-    private final List<Task> taskList;
+    private final TaskService taskService;
+
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     // listar todas as tarefas
     @GetMapping("/tasks")
     public List<Task> getAllTaskList() {
-        return taskList;
+        return taskService.getAllTasks();
     }
 
     // adicionar uma nova tarefa
     @PostMapping("/tasks/add")
     public Task addTask(@RequestBody Task task) {
-        taskList.add(task);
-        return task;
+        return taskService.addTask(task);
     }
 
-    // editar uma tarefa
     @PutMapping("/tasks/edit/{taskId}")
     public Task editTask(@PathVariable Long taskId, @RequestBody Map<String, Object> updates) {
-        Optional<Task> taskToEdit = findTaskById(taskId);
+        Optional<Task> taskToEdit = taskService.findTaskById(taskId);
 
         if (taskToEdit.isPresent()) {
             Task existingTask = taskToEdit.get();
@@ -55,15 +58,11 @@ public class TaskController {
     // remover uma tarefa
     @DeleteMapping("/tasks/delete/{taskId}")
     public void deleteTask(@PathVariable Long taskId) {
-        Optional<Task> taskToDelete = findTaskById(taskId);
+        Optional<Task> taskToDelete = taskService.findTaskById(taskId);
         if (taskToDelete.isPresent()) {
-            taskList.remove(taskToDelete.get());
+            taskService.deleteTask(taskId);
         } else {
             throw new TaskNotFoundException("Tarefa " + taskId + " não encontrada.");
-        }
-    }
-
-    private Optional<Task> findTaskById(Long taskId) {
-        return taskList.stream().filter(task -> task.getTaskId() == taskId).findFirst();
+        } // está retornando erro 500, melhorar a tratativa de erros
     }
 }
