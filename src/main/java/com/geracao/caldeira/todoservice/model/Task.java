@@ -22,7 +22,10 @@ public class Task {
     @AssertFalse(message = "A tarefa não pode estar marcada como concluída!")
     private boolean completed;
 
-    public Task() {
+    public Task(String description, Date dueDate, boolean completed) {
         this.taskId = idCounter.incrementAndGet();
+        this.description = description;
+        this.dueDate = dueDate;
+        this.completed = completed;
     }
 }
