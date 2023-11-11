@@ -55,7 +55,6 @@ public class TaskServiceTest {
         assertEquals("estudar java", addedTask.getDescription());
     }
 
-    // in progress
     @Test
     public void testEditTask() {
         Task existingTask = new Task("exemplo de tarefa já existente", new Date(), false);
@@ -67,12 +66,45 @@ public class TaskServiceTest {
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("description", "exemplo de tarefa atualizada");
+        updates.put("completed", true);
 
         // Chame o método a ser testado para atualizar a conclusão
-        Task editedTask = taskService.editTask(1L, updates);
+        Task updatedTask = new Task(
+                (String) updates.get("description"),
+                existingTask.getDueDate(),
+                (Boolean) updates.get("completed")
+        );
+        updatedTask.setTaskId(existingTask.getTaskId());
+
+        Task editedTask = taskService.editTask(1L, updatedTask);
 
         assertNotNull(editedTask);
         assertEquals("exemplo de tarefa atualizada", editedTask.getDescription());
         assertTrue(editedTask.isCompleted());
+    }
+
+    @Test
+    public void testDeleteTask() {
+        long taskId = 1L;
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.of(new Task("tarefa a ser deletada", new Date(), false)));
+
+        taskService.deleteTask(taskId);
+
+        Mockito.verify(taskRepository).delete(Mockito.any(Task.class));
+    }
+
+    @Test
+    public void testFindTaskById() {
+        long taskId = 1L;
+
+        Task expectedTask = new Task("tarefa a ser encontrada", new Date(), false);
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.of(expectedTask));
+
+        Optional<Task> foundTask = taskService.findTaskById(taskId);
+
+        assertTrue(foundTask.isPresent());
+        assertEquals(expectedTask, foundTask.get());
     }
 }
